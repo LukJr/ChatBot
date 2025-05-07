@@ -1,4 +1,58 @@
-import Image from "next/image";
+"use client"; // šis norāda, ka app darbojas browserī un var pievienot interaktīvas komponentes (otrs variants ir No Directive, kas darbojas uz servera un ir statiskas komponenetes)
+
+import { useState } from "react"; // importēts 'useStare' (React rīks), kas ļauj atcerēties dažādas lietas aplikācijai
+
+export default function Home() {
+  const [messages, setMessages] = useState<string[]>([]); // 'messages'-aktuālā vērtība, 'setMessages'-funkcija, kas atjauno aktuālo vērtību, 'string[]'-string saraksts (sākuma vērtība)
+  const [input, setInput] = useState(""); // 'input'-aktuālā vērtība, 'setInput'-funkcija, kas atjauno aktuālo vērtību, ""-tukša vērtība (sākuma vērtība)
+
+  function handleSendMessage(e: React.FormEvent) {
+    e.preventDefault(); // aptur lapas atsvaidzināšanu, kad veidlapa tiek iesniegta
+
+    if (!input.trim()) return; // ja lietotājs nav neko ierakstījis, tad to neiesniegt
+
+    //setMessages([...messages, "You: " + input]); // iedeva arī šādu opciju, bet tad teica, ka labāka ir otra funkcija??
+
+    setMessages((prev) => [...prev, "You: " + input, "Bot: This is a fake answer."]);
+    setInput(""); // notīra ievades logu pēc ziņojuma iesniegšanas
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
+      <h1 className="text-2xl font-bold mb-4 text-gray-800">Simple Chatbot</h1>
+
+      <div className="w-full max-w-md h-96 bg-white rounded-lg shadow p-4 overflow-y-auto mb-4">
+        {messages.length === 0 && (
+          <p className="text-gray-400 text-center">Start the conversation…</p>
+        )}
+        {messages.map((msg, i) => (
+          <p key={i} className="mb-2 text-sm text-gray-900">
+            {msg}
+          </p>
+        ))}
+      </div>
+
+      <form onSubmit={handleSendMessage} className="w-full max-w-md flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your question..."
+          className="flex-1 p-2 rounded border border-gray-300 text-gray-900"
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Send
+        </button>
+      </form>
+    </div>
+  );
+}
+
+
+/*import Image from "next/image";
 
 export default function Home() {
   return (
@@ -100,4 +154,4 @@ export default function Home() {
       </footer>
     </div>
   );
-}
+}*/
