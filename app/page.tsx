@@ -1,48 +1,109 @@
 "use client"; // šis norāda, ka app darbojas browserī un var pievienot interaktīvas komponentes (otrs variants ir No Directive, kas darbojas uz servera un ir statiskas komponenetes)
 
 import { useState } from "react"; // importēts 'useStare' (React rīks), kas ļauj atcerēties dažādas lietas aplikācijai
+import ChatMessage from "@/components/ChatMessage";
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
 
 export default function Home() {
-  const [messages, setMessages] = useState<string[]>([]); // 'messages'-aktuālā vērtība, 'setMessages'-funkcija, kas atjauno aktuālo vērtību, 'string[]'-string saraksts (sākuma vērtība)
-  const [input, setInput] = useState(""); // 'input'-aktuālā vērtība, 'setInput'-funkcija, kas atjauno aktuālo vērtību, ""-tukša vērtība (sākuma vērtība)
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [context, setContext] = useState<number[] | null>(null);
 
-  function handleSendMessage(e: React.FormEvent) {
-    e.preventDefault(); // aptur lapas atsvaidzināšanu, kad veidlapa tiek iesniegta
+  async function handleSendMessage(e: React.FormEvent) {
+    e.preventDefault();
 
-    if (!input.trim()) return; // ja lietotājs nav neko ierakstījis, tad to neiesniegt
+    const userMessage = input.trim();
+    if (!userMessage) return;
 
-    //setMessages([...messages, "You: " + input]); // iedeva arī šādu opciju, bet tad teica, ka labāka ir otra funkcija??
+    // Add user message to chat
+    const newUserMessage: Message = { role: "user", content: userMessage };
+    const updatedMessages: Message[] = [...messages, newUserMessage];
+    setMessages(updatedMessages);
+    setInput("");
+    setIsLoading(true);
 
-    setMessages((prev) => [...prev, "You: " + input, "Bot: This is a fake answer."]);
-    setInput(""); // notīra ievades logu pēc ziņojuma iesniegšanas
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          contextData: context,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get response");
+      }
+
+      const data = await response.json();
+      
+      // Add bot response to chat
+      const botMessage: Message = { role: "assistant", content: data.response };
+      setMessages([...updatedMessages, botMessage]);
+      
+      // Save context for the next message
+      if (data.context) {
+        setContext(data.context);
+      }
+    } catch (error) {
+      console.error("Error fetching response:", error);
+      const errorMessage: Message = {
+        role: "assistant",
+        content: "Sorry, I encountered an error. Please try again."
+      };
+      setMessages([...updatedMessages, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800">Simple Chatbot</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gray-800">Ollama Chatbot</h1>
 
-      <div className="w-full max-w-md h-96 bg-white rounded-lg shadow p-4 overflow-y-auto mb-4">
+      <div className="w-full max-w-2xl bg-white rounded-lg shadow p-4 overflow-y-auto mb-4" style={{ height: "70vh" }}>
         {messages.length === 0 && (
-          <p className="text-gray-400 text-center">Start the conversation…</p>
+          <p className="text-gray-800 text-center">Start the conversation…</p>
         )}
         {messages.map((msg, i) => (
-          <p key={i} className="mb-2 text-sm text-gray-900">
-            {msg}
-          </p>
+          <ChatMessage 
+            key={i} 
+            message={msg.content} 
+            isUser={msg.role === "user"} 
+          />
         ))}
+        {isLoading && (
+          <div className="flex justify-center items-center mt-2">
+            <div className="animate-pulse">Thinking...</div>
+          </div>
+        )}
       </div>
 
-      <form onSubmit={handleSendMessage} className="w-full max-w-md flex gap-2">
+      <form onSubmit={handleSendMessage} className="w-full max-w-2xl flex gap-2">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type your question..."
           className="flex-1 p-2 rounded border border-gray-300 text-gray-900"
+          disabled={isLoading}
         />
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className={`px-4 py-2 rounded text-white ${
+            isLoading 
+              ? "bg-blue-300 cursor-not-allowed" 
+              : "bg-blue-500 hover:bg-blue-600"
+          }`}
+          disabled={isLoading}
         >
           Send
         </button>

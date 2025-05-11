@@ -1,20 +1,25 @@
 version: "3.8"
 
 services:
-  chatbot:
-    build: .
+  chatbot-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - OLLAMA_HOST=http://ollama:11434
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma3:1b}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma3} #gemma3:1b}
+      - WATCHPACK_POLLING=true # Enable polling for Windows file changes
     volumes:
-      - .:/app
+      - .:/app:cached # Use cached mode for better performance on Windows
+      - chatbot_node_modules:/app/node_modules # Use named volume for node_modules
+      - chatbot_next_cache:/app/.next # Use named volume for .next
     restart: unless-stopped
     depends_on:
-      ollama-init:
-        condition: service_completed_successfully
+      - ollama
+    command: npm run dev
 
   ollama:
     image: ollama/ollama:latest
@@ -25,17 +30,18 @@ services:
     restart: unless-stopped
 
   ollama-init:
-    image: ollama/ollama:latest
+    image: alpine:latest
     depends_on:
       - ollama
     command: >
       sh -c "
         echo 'Waiting for Ollama service to be ready...' &&
+        apk add --no-cache wget curl &&
         for i in {1..30}; do
           if wget -q --spider http://ollama:11434/api/tags; then
             echo 'Ollama service is up!' &&
-            echo 'Pulling Gemma3 1B model (smaller, ~815MB)...' &&
-            ollama pull gemma3:1b &&
+            echo 'Pulling model ${OLLAMA_MODEL:-gemma3}...' &&
+            curl -X POST http://ollama:11434/api/pull -d '{\"name\":\"${OLLAMA_MODEL:-gemma3}\"}' &&
             echo 'Model pulled successfully!' &&
             exit 0;
           fi;
@@ -49,3 +55,5 @@ services:
 
 volumes:
   ollama_data:
+  chatbot_node_modules:
+  chatbot_next_cache: 

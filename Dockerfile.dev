@@ -1,0 +1,26 @@
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Install nodemon for better development experience
+RUN npm install -g nodemon
+
+# No need to copy files or build since we'll mount the local directory
+# and run in development mode with hot reloading
+
+# Expose port
+EXPOSE 3000
+
+# Start development server with polling for Windows file system
+ENV WATCHPACK_POLLING=true
+ENV CHOKIDAR_USEPOLLING=true
+
+# Start development server
+CMD ["npm", "run", "dev"] 
