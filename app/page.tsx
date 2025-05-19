@@ -66,50 +66,77 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800">Ollama Chatbot</h1>
-
-      <div className="w-full max-w-2xl bg-white rounded-lg shadow p-4 overflow-y-auto mb-4" style={{ height: "70vh" }}>
-        {messages.length === 0 && (
-          <p className="text-gray-800 text-center">Start the conversation…</p>
-        )}
-        {messages.map((msg, i) => (
-          <ChatMessage 
-            key={i} 
-            message={msg.content} 
-            isUser={msg.role === "user"} 
-          />
-        ))}
-        {isLoading && (
-          <div className="flex justify-center items-center mt-2">
-            <div className="animate-pulse">Thinking...</div>
-          </div>
-        )}
+    <div className="min-h-screen bg-gray-100 p-4 flex flex-col items-center justify-between">
+      {/* Logo un virsraksts */}
+      <div className="flex flex-col items-center">
+        <img src="/logo12.png" alt="Rīgas Dome Logo" className="h-14 mb-1" />
+        <h1 className="text-xl font-bold text-gray-800 mb-4 text-center">
+          Rīgas pašvaldības klientu atbalsta asistents
+        </h1>
       </div>
+  
+      {/* Čata logs un forma kopā */}
+      <div className="w-full max-w-5xl bg-white rounded-lg shadow p-4 mb-6">
+        {/* Čata logs */}
+        <div className="h-[300px] overflow-y-auto mb-4 border border-gray-200 rounded p-2">
+          {messages.length === 0 && (
+            <p className="text-gray-400 text-center">Uzsāc sarunu...</p>
+          )}
+          {messages.map((msg, i) => (
+            <p key={i} className="mb-2 text-sm text-gray-900">
+              {msg}
+            </p>
+          ))}
+        </div>
+  
+        {/* Forma */}
+        <form onSubmit={handleSendMessage} className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Uzdod sev interesējošo jautājumu..."
+            className="flex-1 p-2 rounded border border-gray-300 text-gray-900"
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Nosūtīt
+          </button>
+        </form>
+      </div>
+  
+      {/* Footer */}
+      <footer className="w-full bg-gray-200 text-gray-700 px-6 py-3 text-sm">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between gap-6">
+          {/* Kreisā kolonna */}
+          <div>
+            <p className="font-semibold mb-1">Rīgas Apkaimju iedzīvotāju centrs</p>
+            <p>Adrese: Brīvības iela 49–53, Centra rajons, Rīga, LV-1010</p>
+            <div className="mt-2">
+              <p><strong>Kontakti:</strong></p>
+              <p>aic@riga.lv</p>
+              <p>‪+371 80000800‬</p>
+            </div>
+          </div>
+           {/* Labā kolonna */}
+          <div>
+            <p className="font-semibold mb-2">Darba laiks:</p>
+            <p><strong>Pirmdiena:</strong> 08–19</p>
+            <p><strong>Otrdiena:</strong> 08–18</p>
+            <p><strong>Trešdiena:</strong> 08–18</p>
+            <p><strong>Ceturtdiena:</strong> 08–19</p>
+            <p><strong>Piektdiena:</strong> 08–17</p>
+            <p><strong>Sestdiena:</strong> Slēgts</p>
+            <p><strong>Svētdiena:</strong> Slēgts</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+  
 
-      <form onSubmit={handleSendMessage} className="w-full max-w-2xl flex gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your question..."
-          className="flex-1 p-2 rounded border border-gray-300 text-gray-900"
-          disabled={isLoading}
-        />
-        <button
-          type="submit"
-          className={`px-4 py-2 rounded text-white ${
-            isLoading 
-              ? "bg-blue-300 cursor-not-allowed" 
-              : "bg-blue-500 hover:bg-blue-600"
-          }`}
-          disabled={isLoading}
-        >
-          Send
-        </button>
-      </form>
-    </div>
-  );
 }
 
 
