@@ -14,21 +14,6 @@ services:
       - ollama
     command: sh -c "npm run build && npm start"
 
-  # The model puller service
-  model-init:
-    image: curlimages/curl:latest
-    depends_on:
-      - ollama
-    restart: "no"
-    entrypoint: >
-      sh -c "
-        echo 'Waiting for Ollama to start...' &&
-        sleep 15 &&
-        echo 'Pulling model...' &&
-        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"gemma3:latest\"}' &&
-        echo 'Model pulled successfully!'
-      "
-
   ollama:
     image: ollama/ollama:latest
     ports:
