@@ -1,27 +1,32 @@
 FROM node:18-alpine
+
+# Set working directory
 WORKDIR /app
 
-# Set PATH to include node_modules/.bin
-ENV PATH /app/node_modules/.bin:$PATH
-
-# Copy package files
-COPY package.json package-lock.json ./
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
 # Install dependencies
 RUN npm ci
 
-# Copy application source code
+# Copy the rest of the code
 COPY . .
 
-# Build the application and verify the build
-RUN npm run build && \
-    ls -la .next || echo "Build failed - .next directory not created"
+# Run the debugging script to inspect the setup
+RUN node debug-nextjs.js
 
-# Set environment variables
-ENV NODE_ENV=production
+# Make sure next.config.js is being used instead of next.config.ts
+RUN if [ -f next.config.ts ]; then rm next.config.ts; fi
 
-# Expose the application port
+# Try to build Next.js with multiple approaches
+RUN echo "Attempting to build with npx next build" && \
+    npx next build || \
+    echo "Trying alternative build approach" && \
+    NODE_ENV=production npx next build || \
+    echo "Failed to build Next.js application"
+
+# Expose port
 EXPOSE 3000
 
-# Start the application with debugging information
-CMD ["sh", "-c", "ls -la && ls -la .next || echo '.next directory not found' && npx next start -H 0.0.0.0"]
+# If build failed, run debug script otherwise start the app
+CMD ["sh", "-c", "if [ ! -d .next ]; then node debug-nextjs.js; else npx next start -H 0.0.0.0; fi"]
