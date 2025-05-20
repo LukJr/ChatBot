@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start -H 0.0.0.0",
-    "lint": "next lint"
+    "dev": "npx next dev --turbopack",
+    "build": "npx next build",
+    "start": "npx next start -H 0.0.0.0",
+    "lint": "npx next lint"
   },
   "dependencies": {
     "cheerio": "^1.0.0",

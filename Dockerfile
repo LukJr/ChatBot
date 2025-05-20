@@ -1,6 +1,9 @@
 FROM node:18-alpine
 WORKDIR /app
 
+# Set PATH to include node_modules/.bin
+ENV PATH /app/node_modules/.bin:$PATH
+
 # Copy package files
 COPY package.json package-lock.json ./
 
