@@ -26,22 +26,22 @@ services:
     image: ollama/ollama:latest
     depends_on:
       - ollama
-    entrypoint: sh 
+    entrypoint: sh
     command: -c "
-        echo 'Waiting for Ollama service to be ready...' &&
-        for i in {1..30}; do
-          if wget -q --spider http://ollama:11434/api/tags; then
-            echo 'Ollama service is up!' &&
-            echo 'Pulling Gemma3 model...' &&
-            ollama pull gemma3:latest &&
-            echo 'Model pulled successfully!' &&
-            exit 0;
-          fi;
-          echo 'Waiting...' &&
-          sleep 2;
-        done;
-        echo 'Ollama service failed to start in time!' &&
-        exit 1;
+      echo 'Waiting for Ollama service to be ready...' &&
+      for i in \$(seq 1 30); do
+        if curl -s http://ollama:11434/api/tags > /dev/null; then
+          echo 'Ollama service is up!' &&
+          echo 'Pulling Gemma3 model...' &&
+          ollama pull gemma3:latest &&
+          echo 'Model pulled successfully!' &&
+          exit 0;
+        fi;
+        echo 'Waiting...' &&
+        sleep 2;
+      done;
+      echo 'Ollama service failed to start in time!' &&
+      exit 1;
       "
     restart: on-failure
 
