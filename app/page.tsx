@@ -66,7 +66,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 flex flex-col items-center justify-between">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center">
       {/* Logo un virsraksts */}
       <div className="flex flex-col items-center">
         <img src="/logo12.png" alt="Rīgas Dome Logo" className="h-14 mb-1" />
@@ -76,9 +76,9 @@ export default function Home() {
       </div>
   
       {/* Čata logs un forma kopā */}
-      <div className="w-full max-w-5xl bg-white rounded-lg shadow p-4 mb-6">
+      <div className="w-full max-w-5xl bg-white rounded-lg shadow p-4 flex flex-col" style={{ height: 'calc(100vh - 100px)' }}>
         {/* Čata logs */}
-        <div className="h-[300px] overflow-y-auto mb-4 border border-gray-200 rounded p-2">
+        <div className="flex-1 overflow-y-auto border border-gray-200 rounded p-2 mb-4">
           {messages.length === 0 && (
             <p className="text-gray-400 text-center">Uzsāc sarunu...</p>
           )}
@@ -121,7 +121,7 @@ export default function Home() {
       </div>
   
       {/* Footer */}
-      <footer className="w-full bg-gray-200 text-gray-700 px-6 py-3 text-sm">
+      <footer className="w-full bg-gray-200 text-gray-700 px-6 py-3 text-sm mt-10">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between gap-6">
           {/* Kreisā kolonna */}
           <div>
