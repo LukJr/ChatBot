@@ -83,10 +83,17 @@ export default function Home() {
             <p className="text-gray-400 text-center">Uzsāc sarunu...</p>
           )}
           {messages.map((msg, i) => (
-            <p key={i} className="mb-2 text-sm text-gray-900">
-              {msg}
-            </p>
+            <ChatMessage 
+              key={i} 
+              message={msg.content} 
+              isUser={msg.role === "user"} 
+            />
           ))}
+          {isLoading && (
+            <div className="flex justify-center items-center mt-2">
+              <div className="animate-pulse">Domāju...</div>
+            </div>
+          )}
         </div>
   
         {/* Forma */}
@@ -97,10 +104,16 @@ export default function Home() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Uzdod sev interesējošo jautājumu..."
             className="flex-1 p-2 rounded border border-gray-300 text-gray-900"
+            disabled={isLoading}
           />
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className={`px-4 py-2 rounded text-white ${
+              isLoading 
+                ? "bg-blue-300 px-4 py-2 rounded cursor-not-allowed" 
+                : "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            }`}
+            disabled={isLoading}
           >
             Nosūtīt
           </button>
