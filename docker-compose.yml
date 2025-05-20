@@ -11,55 +11,15 @@ services:
       - .:/app
     restart: unless-stopped
     depends_on:
-      ollama-init:
-        condition: service_completed_successfully
+      - ollama
 
   ollama:
     image: ollama/ollama:latest
-    volumes:
-      - ollama_data:/root/.ollama
     ports:
       - "11434:11434"
-    restart: unless-stopped
-
-  ollama-init:
-    image: debian:bookworm-slim
-    depends_on:
-      - ollama
-    entrypoint: bash
-    command: -c "
-      set -e &&
-      echo '[1/3] Installing prerequisites...' &&
-      apt-get update -qq &&
-      apt-get install -y -qq curl ca-certificates > /dev/null &&
-
-      echo '[2/3] Installing Ollama CLI...' &&
-      curl -fsSL https://ollama.com/install.sh | bash &&
-
-      echo '[3/3] Verifying Ollama installation...' &&
-      /usr/local/bin/ollama --version &&
-
-      echo 'Waiting for Ollama service...' &&
-      for i in \$(seq 1 30); do
-        if curl -s http://ollama:11434/api/tags > /dev/null; then
-          echo 'Ollama is ready. Pulling model...' &&
-          /usr/local/bin/ollama pull gemma3:latest &&
-          echo 'Model pulled successfully!' &&
-          exit 0;
-        fi;
-        echo 'Waiting...'; sleep 2;
-      done;
-
-      echo 'Ollama service failed to start in time.';
-      exit 1;
-      "
     volumes:
       - ollama_data:/root/.ollama
-    restart: on-failure
-
-
-
-
+    restart: unless-stopped
 
 volumes:
   ollama_data:
