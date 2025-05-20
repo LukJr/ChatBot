@@ -30,7 +30,7 @@ services:
     command: -c "
       echo 'Installing curl and ollama...' &&
       apk add --no-cache curl bash unzip && \
-      curl -L https://github.com/ollama/ollama/releases/latest/download/ollama-linux-amd64 -o /usr/local/bin/ollama && \
+      curl -L https://github.com/ollama/ollama/releases/download/v0.1.28/ollama-linux-amd64 -o /usr/local/bin/ollama && \
       chmod +x /usr/local/bin/ollama &&
 
       echo 'Waiting for Ollama service to be ready...' &&
