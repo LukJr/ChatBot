@@ -26,8 +26,8 @@ services:
     image: ollama/ollama:latest
     depends_on:
       - ollama
-    command: >
-      sh -c "
+    entrypoint: sh 
+    command: -c "
         echo 'Waiting for Ollama service to be ready...' &&
         for i in {1..30}; do
           if wget -q --spider http://ollama:11434/api/tags; then
