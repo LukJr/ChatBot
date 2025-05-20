@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npx next dev --turbopack",
+    "dev": "npx next dev",
     "build": "npx next build",
     "start": "npx next start -H 0.0.0.0",
     "lint": "npx next lint"
@@ -24,5 +24,8 @@
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
     "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
