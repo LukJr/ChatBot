@@ -28,24 +28,29 @@ services:
       - ollama
     entrypoint: sh
     command: -c "
-      echo 'Installing curl and ollama...' &&
-      apk add --no-cache curl bash unzip && \
-      curl -L https://github.com/ollama/ollama/releases/download/v0.1.28/ollama-linux-amd64 -o /usr/local/bin/ollama && \
+      set -e &&
+      echo '[1/3] Installing curl and bash...' &&
+      apk add --no-cache curl bash > /dev/null &&
+
+      echo '[2/3] Downloading ollama CLI...' &&
+      curl -fsSL -o /usr/local/bin/ollama https://github.com/ollama/ollama/releases/download/v0.1.28/ollama-linux-amd64 && \
       chmod +x /usr/local/bin/ollama &&
 
-      echo 'Waiting for Ollama service to be ready...' &&
+      echo '[3/3] Checking ollama version:' &&
+      /usr/local/bin/ollama version &&
+
+      echo 'Waiting for Ollama service...' &&
       for i in \$(seq 1 30); do
         if curl -s http://ollama:11434/api/tags > /dev/null; then
-          echo 'Ollama service is up!' &&
-          echo 'Pulling Gemma3 model...' &&
-          ollama pull gemma3:latest &&
+          echo 'Ollama is ready. Pulling model...' &&
+          /usr/local/bin/ollama pull gemma3:latest &&
           echo 'Model pulled successfully!' &&
           exit 0;
         fi;
-        echo 'Waiting...' &&
-        sleep 2;
+        echo 'Waiting...'; sleep 2;
       done;
-      echo 'Ollama service failed to start in time!' &&
+
+      echo 'Ollama service failed to start in time.';
       exit 1;
       "
     volumes:
