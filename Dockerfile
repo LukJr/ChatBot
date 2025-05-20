@@ -3,10 +3,21 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
-# No need to copy package files or build - will be mounted from host
-# Just install any global tools needed
-RUN npm install -g next
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (not just production)
+RUN npm install
+
+# Copy the rest of the code
+COPY . .
+
+# Create a jsconfig.json to handle path aliases
+RUN echo '{"compilerOptions":{"baseUrl":"./","paths":{"@/*":["*"]}}}' > jsconfig.json
+
+# Install missing dependencies
+RUN npm install -D tailwindcss postcss autoprefixer
 
 EXPOSE 3000
 
-# The actual build and run commands are in docker-compose.yml
+# Start command will be provided by docker-compose.yml
