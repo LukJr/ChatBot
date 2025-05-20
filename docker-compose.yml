@@ -23,11 +23,16 @@ services:
     restart: unless-stopped
 
   ollama-init:
-    image: ollama/ollama:latest
+    image: alpine:latest
     depends_on:
       - ollama
     entrypoint: sh
     command: -c "
+      echo 'Installing curl and ollama...' &&
+      apk add --no-cache curl bash && \
+      curl -fsSL https://ollama.com/download/OllamaLinux -o /usr/local/bin/ollama && \
+      chmod +x /usr/local/bin/ollama &&
+
       echo 'Waiting for Ollama service to be ready...' &&
       for i in \$(seq 1 30); do
         if curl -s http://ollama:11434/api/tags > /dev/null; then
@@ -43,6 +48,8 @@ services:
       echo 'Ollama service failed to start in time!' &&
       exit 1;
       "
+    volumes:
+      - ollama_data:/root/.ollama
     restart: on-failure
 
 volumes:
