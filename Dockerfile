@@ -3,8 +3,13 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
-# No need to copy package files or build - will be mounted from host
-# Just install any global tools needed
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install dependencies
+RUN npm install
+
+# Install global tools
 RUN npm install -g next
 
 EXPOSE 3000
