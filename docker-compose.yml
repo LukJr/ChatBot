@@ -8,6 +8,7 @@ services:
       - OLLAMA_HOST=http://ollama:11434
       - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma3:latest}
     volumes:
+      - .:/app
       - next_build:/app/.next
     restart: unless-stopped
     depends_on:
