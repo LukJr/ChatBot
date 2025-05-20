@@ -1,39 +1,16 @@
-FROM node:20-alpine AS builder
-
-# Set working directory
+FROM node:18-alpine AS runner
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy application code
-COPY . .
-
-# Set proper next.config.js
-RUN echo 'module.exports = {output: "standalone"}' > next.config.js
-
-# Build the application
-RUN npm run build
-
-# Production image
-FROM node:20-alpine AS runner
-WORKDIR /app
-
-# Copy necessary files from builder
-COPY --from=builder /app/next.config.js ./
+# Copy only needed files
+COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
 
-# Set environment variables
+# Install production-only dependencies
+RUN npm install
+
 ENV NODE_ENV=production
-ENV PORT=3000
-
-# Expose port
 EXPOSE 3000
 
-# Start the application
-CMD ["node", "server.js"]
+CMD ["npm", "start"]

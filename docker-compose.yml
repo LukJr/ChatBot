@@ -1,17 +1,18 @@
 services:
   chatbot:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
       - OLLAMA_HOST=http://ollama:11434
       - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma3:latest}
+    volumes:
+      - next_build:/app/.next
     restart: unless-stopped
     depends_on:
       - ollama
+    command: sh -c "npm run build && npm start"
 
   ollama:
     image: ollama/ollama:latest
@@ -23,3 +24,4 @@ services:
 
 volumes:
   ollama_data:
+  next_build:
