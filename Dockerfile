@@ -1,16 +1,12 @@
-FROM node:18-alpine AS runner
+FROM node:20-alpine
+
+# Set working directory
 WORKDIR /app
 
-# Copy only needed files
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/package-lock.json ./package-lock.json
+# No need to copy package files or build - will be mounted from host
+# Just install any global tools needed
+RUN npm install -g next
 
-# Install production-only dependencies
-RUN npm install
-
-ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# The actual build and run commands are in docker-compose.yml
