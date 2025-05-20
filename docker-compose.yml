@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
 
   ollama-init:
-    image: curlimages/curl:latest
+    image: ollama/ollama:latest
     depends_on:
       - ollama
     command: >
