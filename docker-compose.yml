@@ -6,7 +6,7 @@ services:
     environment:
       - NODE_ENV=production
       - OLLAMA_HOST=http://ollama:11434
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma3:1b}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma3:latest}
     volumes:
       - .:/app
     restart: unless-stopped
@@ -33,7 +33,7 @@ services:
           if wget -q --spider http://ollama:11434/api/tags; then
             echo 'Ollama service is up!' &&
             echo 'Pulling Gemma3 1B model (smaller, ~815MB)...' &&
-            ollama pull gemma3:1b &&
+            ollama pull gemma3:latest &&
             echo 'Model pulled successfully!' &&
             exit 0;
           fi;

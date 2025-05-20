@@ -8,7 +8,7 @@ services:
     environment:
       - NODE_ENV=development
       - OLLAMA_HOST=http://ollama:11434
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma3} #gemma3:1b}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma3:latest} #gemma3:1b}
       - WATCHPACK_POLLING=true # Enable polling for Windows file changes
     volumes:
       - .:/app:cached # Use cached mode for better performance on Windows
@@ -38,8 +38,8 @@ services:
         for i in {1..30}; do
           if wget -q --spider http://ollama:11434/api/tags; then
             echo 'Ollama service is up!' &&
-            echo 'Pulling model ${OLLAMA_MODEL:-gemma3}...' &&
-            curl -X POST http://ollama:11434/api/pull -d '{\"name\":\"${OLLAMA_MODEL:-gemma3}\"}' &&
+            echo 'Pulling model ${OLLAMA_MODEL:-gemma3:latest}...' &&
+            curl -X POST http://ollama:11434/api/pull -d '{\"name\":\"${OLLAMA_MODEL:-gemma3:latest}\"}' &&
             echo 'Model pulled successfully!' &&
             exit 0;
           fi;
