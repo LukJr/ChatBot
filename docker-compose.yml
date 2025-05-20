@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
 
   ollama-init:
-    image: ollama/ollama:latest
+    image: curlimages/curl:latest
     depends_on:
       - ollama
     command: >
@@ -32,7 +32,7 @@ services:
         for i in {1..30}; do
           if wget -q --spider http://ollama:11434/api/tags; then
             echo 'Ollama service is up!' &&
-            echo 'Pulling Gemma3 1B model (smaller, ~815MB)...' &&
+            echo 'Pulling Gemma3 model...' &&
             ollama pull gemma3:latest &&
             echo 'Model pulled successfully!' &&
             exit 0;
