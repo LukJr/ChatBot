@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
 
 # Copy application source code
 COPY . .
@@ -16,15 +16,16 @@ RUN npm run build
 FROM node:18-alpine AS runner
 WORKDIR /app
 
-# Copy built assets and necessary files from the builder stage
+# Set environment variables
+ENV NODE_ENV=production
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Copy the build output from builder stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/package-lock.json ./package-lock.json
-
-# Set environment variables
-ENV NODE_ENV=production
 
 # Expose the application port
 EXPOSE 3000
