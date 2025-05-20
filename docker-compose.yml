@@ -11,7 +11,8 @@ services:
       - next_build:/app/.next
     restart: unless-stopped
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
     command: sh -c "npm run build && npm start"
 
   ollama:
@@ -21,6 +22,15 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    # Download the model during container initialization
+    # Try to pull gemma3 first, if it fails fall back to llama3
+    command: sh -c "ollama serve & sleep 5 && (ollama pull gemma3:latest || ollama pull llama3:latest) && tail -f /dev/null"
 
 volumes:
   ollama_data:
