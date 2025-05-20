@@ -22,8 +22,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/package-lock.json ./package-lock.json
 
-# Install production dependencies
-RUN npm install --omit=dev
+# Install production dependencies and make sure next is available globally
+RUN npm install --production
+RUN npm install -g next
 
 # Set environment variables
 ENV NODE_ENV=production
