@@ -29,8 +29,8 @@ services:
     entrypoint: sh
     command: -c "
       echo 'Installing curl and ollama...' &&
-      apk add --no-cache curl bash && \
-      curl -fsSL https://ollama.com/download/OllamaLinux -o /usr/local/bin/ollama && \
+      apk add --no-cache curl bash unzip && \
+      curl -L https://github.com/ollama/ollama/releases/latest/download/ollama-linux-amd64 -o /usr/local/bin/ollama && \
       chmod +x /usr/local/bin/ollama &&
 
       echo 'Waiting for Ollama service to be ready...' &&
@@ -51,6 +51,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: on-failure
+
 
 volumes:
   ollama_data:
